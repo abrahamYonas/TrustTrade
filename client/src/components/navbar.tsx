@@ -6,38 +6,11 @@ import { Sheet, SheetContent, SheetTrigger } from "./ui/sheet"
 import { Button } from "./ui/button"
 import viteLogo from '/vite.svg'
 import { MenuIcon, ShoppingCart } from "lucide-react"
-import { useEffect, useState } from "react"
-import { AbstractProvider, JsonRpcSigner, ethers } from "ethers"
-import "./navbar.css"
+import {useWeb3Store} from "@/store/useWeb3Store"
 
 export function Navbar() {
     // State variables for wallet connection status and address
-    const [connected, setConnected] = useState(false);
-    const [provider, setProvider] = useState<AbstractProvider>();
-    const [signer, setSigner] = useState<JsonRpcSigner>();
-    const [walletAddress, setWalletAddress] = useState("");
-
-
-
-    // Function to connect/disconnect the wallet
-    const connectToWallet = async () => {
-        if (window.ethereum) {
-
-            const provider = new ethers.BrowserProvider(window.ethereum);
-            const signer = await provider.getSigner();
-            const walletAddress = await signer.getAddress();
-            setProvider(provider);
-            setSigner(signer);
-            setWalletAddress(walletAddress);
-            setConnected(true);
-        } else {
-            console.log("Meta Mask not installed");
-            setConnected(false);
-        }
-        
-    }
-
-    
+    const { connectWallet, disconnect, address, currentChain,isAuthenticated } = useWeb3Store();
 
     return (
         <header className="flex h-20 w-full shrink-0 items-center px-4 md:px-6">
@@ -89,7 +62,7 @@ export function Navbar() {
 
             </nav>
             <div className="ml-auto space-x-4 flex flex-row gap-x-1 items-center justify-center">
-                <button  onClick={connectToWallet}  className="btn">{connected ? `${walletAddress}` : "Connect Wallet"}</button>
+                <Button onClick={isAuthenticated ? disconnect : connectWallet} size="sm" className="bg-blue-400 hover:bg-blue-500">{isAuthenticated  ? `Disconnect Wallet` : "Connect Wallet"}</Button>
                 <ShoppingCart className="text-white" />
             </div>
         </header>
